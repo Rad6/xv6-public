@@ -31,6 +31,7 @@ main(void)
       printf(1, "init: exec sh failed\n");
       exit();
     }
+    printf(1, "Houmaan Chamani - Kiarash Norouzi - Hadi Heidari Rad\n");
     while((wpid=wait()) >= 0 && wpid != pid)
       printf(1, "zombie!\n");
   }
