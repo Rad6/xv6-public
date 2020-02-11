@@ -198,17 +198,50 @@ uartputs(const char* s){
     uartputc(s[i]);
 }
 
+#define NofSuggestions 10
+typedef struct{
+  char buf[NofSuggestions][INPUT_BUF];
+  int buf_id[NofSuggestions];
+  uint cur_p;
+} Commands;
+Commands history;
+int nof_commands;
+char last_command[INPUT_BUF];
+
+int
+suggest_command(){
+  int i, j, index = -1, prev_id = -1;
+  if(last_command[0] != '\0'){
+    for(i=0; i<10; i++){
+      if(strlen(history.buf[i]) > 0 && (strlen(last_command) < strlen(history.buf[i]))){
+        for(j=0; j<strlen(last_command); j++){
+          if(j == strlen(last_command) - 1){
+            if(last_command[j] == history.buf[i][j]){
+              if(prev_id < history.buf_id[i]){
+                index = i;
+                prev_id = history.buf_id[i];
+              }
+            }
+          }
+          if(last_command[j] != history.buf[i][j])
+            break;
+        }
+      }      
+    }
+  }
+  return index;
+}
 
 void
 consoleintr(int (*getc)(void))
 {
   int c, doprocdump = 0;
 
-  int i, pos;
+  int i, j, pos, suggestion_index = 0;
   const char *ch_clean_screen = "[2J";
   const char *ch_esc = "\033";
   const char *ch_cursor_move = "[1;1H";
-
+  
   acquire(&cons.lock);
   while((c = getc()) >= 0){
     switch(c){
@@ -255,12 +288,56 @@ consoleintr(int (*getc)(void))
           cgaputc('$');
           cgaputc(' ');
 		break;	
+    case 9:
+      for(i=input.w, j = 0; i < input.e; i++, j++)
+          last_command[j] = input.buf[i % INPUT_BUF];      
+      last_command[(input.e - input.w) % INPUT_BUF] = '\0';
+      suggestion_index = suggest_command();
+      // suggestion_index = history.cur_p - 1;
+      if(suggestion_index != -1){    
+        while(input.e != input.w && input.buf[(input.e - 1) % INPUT_BUF] != '\n'){
+          input.e--;
+          consputc(BACKSPACE);
+        }
+        for(i = 0; ; i++){
+          if(history.buf[suggestion_index][i] != '\0'){
+            input.buf[input.e++ % INPUT_BUF] = history.buf[suggestion_index][i];
+            consputc(history.buf[suggestion_index][i]);
+          }
+          else
+            break;
+        }
+      }
+      // release(&cons.lock);
+      // cprintf("(sug=");
+      // printint(suggestion_index, 10, 1);
+      // cprintf(")");
+      // acquire(&cons.lock);
+    break;
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
         input.buf[input.e++ % INPUT_BUF] = c;
         consputc(c);
         if(c == '\n' || c == C('D') || input.e == input.r+INPUT_BUF){
+          
+          for(i = input.w, j=0; i < input.e - 1; i++, j++){
+            history.buf[history.cur_p][j] = input.buf[i % INPUT_BUF];
+            if(i == input.e - 2){
+              history.buf[history.cur_p][(input.e-1 - input.w) % INPUT_BUF] = '\0';
+              history.buf_id[history.cur_p % NofSuggestions] = nof_commands;
+              history.cur_p = (history.cur_p + 1) % NofSuggestions;
+              nof_commands += 1;
+            }
+          }
+        
+          // release(&cons.lock);
+          // cprintf("\n\nTEST-PRINT:");
+          // cprintf(history.buf[history.cur_p]);
+          // printint(history.cur_p, 10, 0);
+          // cprintf("\n\n");
+          // acquire(&cons.lock);
+
           input.w = input.e;
           wakeup(&input.r);
         }
