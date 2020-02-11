@@ -189,9 +189,25 @@ struct {
 #define C(x)  ((x)-'@')  // Control-x
 
 void
+uartputs(const char* s){
+  /*
+    print the string to Serial Port such as ANSI Terminals
+  */
+  int i;
+  for(i = 0; i < strlen(s); i++)
+    uartputc(s[i]);
+}
+
+
+void
 consoleintr(int (*getc)(void))
 {
   int c, doprocdump = 0;
+
+  int i, pos;
+  const char *ch_clean_screen = "[2J";
+  const char *ch_esc = "\033";
+  const char *ch_cursor_move = "[1;1H";
 
   acquire(&cons.lock);
   while((c = getc()) >= 0){
@@ -213,6 +229,32 @@ consoleintr(int (*getc)(void))
         consputc(BACKSPACE);
       }
       break;
+     case C('R'):
+          // makes changes in terminal
+          uartputs(ch_esc);
+          uartputs(ch_clean_screen);
+          uartputs(ch_esc);
+          uartputs(ch_cursor_move);
+          uartputs("$ ");
+
+          // reset buffer pointer
+          while(input.e != input.w && input.buf[(input.e-1) % INPUT_BUF] != '\n')
+            input.e--;
+
+          // Clears CGA using 24 \nS :/
+          for(i=0; i<24; i++)
+            cgaputc('\n');
+          
+          // Setting Cursor Posision to the top left
+          pos = 0;
+          outb(CRTPORT, 14);
+          outb(CRTPORT+1, pos>>8);
+          outb(CRTPORT, 15);
+          outb(CRTPORT+1, pos);
+          
+          cgaputc('$');
+          cgaputc(' ');
+		break;	
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
