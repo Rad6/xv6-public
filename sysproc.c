@@ -89,3 +89,18 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_count_of_digit(void)
+{
+  int num;
+  // if (argint(0, &num) < 0) 
+  //   return -1;
+  struct proc* my_proc = myproc();
+  num = my_proc->tf->ebx;
+  // cprintf("test:%d\n", num);
+  int count = 1;
+  while ((num /= 10) != 0) 
+    count += 1;
+  return count;
+} 
