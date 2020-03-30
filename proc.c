@@ -532,3 +532,11 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int
+count_of_digit(int num){
+  int count = 1;
+  while ((num /= 10) != 0) 
+    count += 1;
+  return count;
+}
