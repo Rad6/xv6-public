@@ -130,15 +130,44 @@ static int (*syscalls[])(void) = {
 [SYS_count_of_digit] sys_count_of_digit,
 };
 
+// need to add the syscalls names too!
+static char* sys_names[] = {
+  "sys_fork",
+  "sys_exit",
+  "sys_wait",
+  "sys_pipe",
+  "sys_read",
+  "sys_kill",
+  "sys_exec",
+  "sys_fstat",
+  "sys_chdir",
+  "sys_dup",
+  "sys_getpid",
+  "sys_sbrk",
+  "sys_sleep",
+  "sys_uptime",
+  "sys_open",
+  "sys_write",
+  "sys_mknod",
+  "sys_unlink",
+  "sys_link",
+  "sys_mkdir",
+  "sys_close",
+  "sys_count_of_digit"
+};
+
 void
 syscall(void)
 {
   int num;
   struct proc *curproc = myproc();
-
+  int return_value;
   num = curproc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    curproc->tf->eax = syscalls[num]();
+    return_value = syscalls[num]();
+    curproc->tf->eax = return_value;
+    if(strncmp(sys_names[num + 1], "sys_count_of_digit", strlen(sys_names[num+1])) == 0)
+    cprintf("%s -> %d\n", sys_names[num + 1], return_value);
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);
