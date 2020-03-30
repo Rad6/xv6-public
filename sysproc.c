@@ -101,3 +101,8 @@ sys_count_of_digit(void)
   // cprintf("test:%d\n", num);
   return count_of_digit(num);
 } 
+
+int
+sys_print_syscalls(void){
+  return print_syscalls();
+}

@@ -104,6 +104,7 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_count_of_digit(void);
+extern int sys_print_syscalls(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -128,6 +129,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_count_of_digit] sys_count_of_digit,
+[SYS_print_syscalls] sys_print_syscalls,
 };
 
 // need to add the syscalls names too!
@@ -153,7 +155,8 @@ static char* sys_names[] = {
   "sys_link",
   "sys_mkdir",
   "sys_close",
-  "sys_count_of_digit"
+  "sys_count_of_digit",
+  "sys_print_syscalls"
 };
 
 void

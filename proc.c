@@ -540,3 +540,8 @@ count_of_digit(int num){
     count += 1;
   return count;
 }
+
+int
+print_syscalls(void){
+  return 0;
+}
