@@ -166,8 +166,8 @@ syscall(void)
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     return_value = syscalls[num]();
     curproc->tf->eax = return_value;
-    if(strncmp(sys_names[num + 1], "sys_count_of_digit", strlen(sys_names[num+1])) == 0)
-    cprintf("%s -> %d\n", sys_names[num + 1], return_value);
+    if(strncmp(sys_names[num - 1], "sys_count_of_digit", strlen(sys_names[num - 1])) == 0)
+    cprintf("%s -> %d\n", sys_names[num - 1], return_value);
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);
