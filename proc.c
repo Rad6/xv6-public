@@ -12,6 +12,12 @@ struct {
   struct proc proc[NPROC];
 } ptable;
 
+struct {
+  struct spinlock lock;
+  struct proc proc[NAPROC];
+  uint curr;
+} hptable;
+
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -230,6 +236,15 @@ exit(void)
   struct proc *curproc = myproc();
   struct proc *p;
   int fd;
+
+  acquire(&hptable.lock);
+  // cprintf("exit : %d %s -> %d\n", curproc->pid, curproc->syscalls_name[0], curproc->syscalls_out[0]);
+  hptable.proc[hptable.curr++] = *curproc;
+  // cprintf("exit2: %d %s -> %d\n", hptable.proc[hptable.curr-1].pid, hptable.proc[hptable.curr-1].syscalls_name[0], hptable.proc[hptable.curr-1].syscalls_out[0]);
+  memset(curproc->syscalls_name, 0, sizeof(curproc->syscalls_name));
+  memset(curproc->syscalls_out, 0, sizeof(curproc->syscalls_out));
+  curproc->psys = 0;
+  release(&hptable.lock);
 
   if(curproc == initproc)
     panic("init exiting");
@@ -539,4 +554,30 @@ count_of_digit(int num){
   while ((num /= 10) != 0) 
     count += 1;
   return count;
+}
+
+int
+print_syscalls(void){
+  acquire(&hptable.lock);
+  acquire(&ptable.lock);
+  cprintf("####### DONE PROCESSES #######\n");
+  for(int i = 0; i < hptable.curr; i++){
+    struct proc* p = &hptable.proc[i];
+    cprintf("Proc %d:\n", p->pid);
+    for(int j = 0; j < p->psys; j++){
+      cprintf("\t-%s:%d\n", p->syscalls_name[j], p->syscalls_out[j]);
+    }
+  }
+  cprintf("##### RUNNING PROCESSES ######\n");
+  for(int i = 0; ; i++){
+    struct proc* p = &ptable.proc[i];
+    if(p->pid == 0) break;
+    cprintf("Proc %d:\n", p->pid);
+    for(int j = 0; j < p->psys; j++){
+      cprintf("\t-%s:%d\n", p->syscalls_name[j], p->syscalls_out[j]);
+    }
+  }
+  release(&ptable.lock);
+  release(&hptable.lock);
+  return 0;
 }
