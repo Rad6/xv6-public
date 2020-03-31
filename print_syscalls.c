@@ -9,6 +9,6 @@ main(int argc, char *argv[])
     printf(2, "too many args!\n");
     exit();
   }
-  
+  print_syscalls();
   exit();
 }
