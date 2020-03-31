@@ -7,6 +7,8 @@
 #include "proc.h"
 #include "spinlock.h"
 
+#define ALARM_HANDLER "alarm_handler"
+
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -580,4 +582,53 @@ print_syscalls(void){
   release(&ptable.lock);
   release(&hptable.lock);
   return 0;
+}
+
+
+// handling incoming alarms
+void
+handle_alarms(void)
+{
+  uint currticks;
+  struct proc *curproc = myproc();
+  safestrcpy(curproc->name, ALARM_HANDLER, sizeof(ALARM_HANDLER));
+
+  for(;;)
+  {
+    curproc = myproc();
+    int pre_alarm_ticks;
+    if (curproc->alarm_ticks > 0)
+    {
+    newone:
+      acquire(&tickslock);
+      currticks = ticks;
+      release(&tickslock);
+      pre_alarm_ticks = curproc->alarm_ticks;
+      while (ticks - currticks < curproc->alarm_ticks || pre_alarm_ticks != curproc->alarm_ticks)
+      {
+        curproc = myproc();
+        if (pre_alarm_ticks != curproc->alarm_ticks)
+          goto newone;
+      }
+      cprintf("ALARM !!!\n");
+      struct proc *p;
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        if (strncmp(p->name, ALARM_HANDLER, sizeof(p->name)) == 0)
+          p->alarm_ticks = 0;
+    }
+  }
+}
+
+
+void
+set_alarm(int msec)
+{
+  struct proc *p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (strncmp(p->name, ALARM_HANDLER, sizeof(p->name)) == 0)
+    {
+      acquire(&ptable.lock);
+      p->alarm_ticks = msec/10;    
+      release(&ptable.lock);
+    }
 }

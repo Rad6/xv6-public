@@ -52,6 +52,8 @@ struct proc {
   char* syscalls_name[NHPPROC];
   int   syscalls_out [NHPPROC];
   uint  psys;
+  int alarm_ticks;            // Time for the alarm in msec
+
 };
 
 // Process memory is laid out contiguously, low addresses first:

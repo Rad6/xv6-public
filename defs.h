@@ -122,6 +122,8 @@ void            wakeup(void*);
 void            yield(void);
 int             count_of_digit(int);
 int             print_syscalls(void);
+void            handle_alarms(void);
+void            set_alarm(int);
 // swtch.S
 void            swtch(struct context**, struct context*);
 
