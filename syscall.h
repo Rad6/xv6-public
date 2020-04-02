@@ -22,3 +22,5 @@
 #define SYS_close  21
 #define SYS_count_of_digit 22
 #define SYS_print_syscalls 23
+#define SYS_set_edx 26
+#define SYS_read_registers 27

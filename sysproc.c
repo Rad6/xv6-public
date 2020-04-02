@@ -106,3 +106,17 @@ int
 sys_print_syscalls(void){
   return print_syscalls();
 }
+
+int
+sys_set_edx(void){
+  int num;
+  if(argint(0, &num) < 0) return -1;
+  set_edx(num);
+  return 0;
+}
+
+int
+sys_read_registers(void){
+  read_registers();
+  return 0;
+}
