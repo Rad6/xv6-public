@@ -106,3 +106,24 @@ int
 sys_print_syscalls(void){
   return print_syscalls();
 }
+
+int
+sys_handle_alarms(void)
+{
+  handle_alarms();
+  return 0;
+}
+
+int
+sys_set_alarm(void)
+{
+  int n;
+  argint(0, &n);
+  if (n <= 0)
+  {
+    cprintf("set_alarm argument must be positive.\n");
+    return -1;
+  }  
+  set_alarm(n);
+  return 0;
+}
