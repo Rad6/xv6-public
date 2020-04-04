@@ -591,8 +591,6 @@ set_edx(int value){
   //   : "%edx"
   // );
   myproc()->tf->edx = value;
-  read_registers();
-  // myproc()->tf->edx = num;
 }
 
 void

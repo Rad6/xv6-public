@@ -14,5 +14,6 @@ main(int argc, char *argv[])
       exit();
   }
   set_edx(atoi(argv[1]));
+  read_registers();
   exit();
 }
