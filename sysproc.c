@@ -127,3 +127,17 @@ sys_set_alarm(void)
   set_alarm(n);
   return 0;
 }
+
+int
+sys_set_edx(void){
+  int num;
+  if(argint(0, &num) < 0) return -1;
+  set_edx(num);
+  return 0;
+}
+
+int
+sys_read_registers(void){
+  read_registers();
+  return 0;
+}

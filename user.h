@@ -27,7 +27,8 @@ int count_of_digit(int);
 int print_syscalls(void);
 void handle_alarms(void);
 void set_alarm(int);
-
+int set_edx(int);
+int read_registers(void);
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);

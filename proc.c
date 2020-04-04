@@ -632,3 +632,31 @@ set_alarm(int msec)
       release(&ptable.lock);
     }
 }
+
+void
+set_edx(int value){
+  // asm volatile(
+  //   "movl %0, %%edx" 
+  //   : // OUTPUT
+  //   : "r"(num) // INPUT
+  //   : "%edx"
+  // );
+  myproc()->tf->edx = value;
+}
+
+void
+read_registers(void){
+  struct proc* p = myproc();
+  struct trapframe* tf = p->tf;
+  cprintf("pid = %d\n", p->pid);
+  cprintf("\
+##### GP registes #####\n\
+\teax = %d,\n\tebx = %d,\n\tecx = %d,\n\tedx = %d\n\tesi = %d\n\
+\tedi = %d\n\tebp = %d\n\tesp = %d\n",
+tf->eax, tf->ebx, tf->ecx, tf->edx, tf->esi, tf->edi, tf->ebp, tf->esp);
+
+  cprintf("##### PC registers #####\n\teip = %d\n", tf->eip);
+  cprintf("### Segment registers ##\n\
+\tcs = %p\n\tds = %p\n\tes = %p\n\tfs = %p\n\tgs = %p\n\tss = %p\n", 
+tf->cs, tf->ds, tf->es, tf->fs, tf->gs, tf->ss);
+}

@@ -24,3 +24,5 @@
 #define SYS_print_syscalls 23
 #define SYS_handle_alarms 24
 #define SYS_set_alarm     25
+#define SYS_set_edx 26
+#define SYS_read_registers 27

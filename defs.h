@@ -124,6 +124,8 @@ int             count_of_digit(int);
 int             print_syscalls(void);
 void            handle_alarms(void);
 void            set_alarm(int);
+void            set_edx(int);
+void            read_registers(void);
 // swtch.S
 void            swtch(struct context**, struct context*);
 

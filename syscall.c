@@ -107,6 +107,8 @@ extern int sys_count_of_digit(void);
 extern int sys_print_syscalls(void);
 extern int sys_handle_alarms(void);
 extern int sys_set_alarm(void);
+extern int sys_set_edx(void);
+extern int sys_read_registers(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]           sys_fork,
@@ -134,6 +136,8 @@ static int (*syscalls[])(void) = {
 [SYS_print_syscalls] sys_print_syscalls,
 [SYS_handle_alarms]  sys_handle_alarms,
 [SYS_set_alarm]      sys_set_alarm,
+[SYS_set_edx] sys_set_edx,
+[SYS_read_registers] sys_read_registers,
 };
 
 // need to add the syscalls names too!
@@ -162,7 +166,9 @@ static char* sys_names[] = {
 [SYS_count_of_digit]  "sys_count_of_digit",
 [SYS_print_syscalls]  "sys_print_syscalls",
 [SYS_handle_alarms]  "sys_handle_alarms",
-[SYS_set_alarm]      "sys_set_alarm"
+[SYS_set_alarm]      "sys_set_alarm",
+[SYS_set_edx] "sys_set_edx",
+[SYS_read_registers] "sys_read_registers",
 };
 
 void
