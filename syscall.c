@@ -160,7 +160,9 @@ static char* sys_names[] = {
 [SYS_mkdir]   "sys_mkdir",
 [SYS_close]   "sys_close",
 [SYS_count_of_digit]  "sys_count_of_digit",
-[SYS_print_syscalls]  "sys_print_syscalls"
+[SYS_print_syscalls]  "sys_print_syscalls",
+[SYS_handle_alarms]  "sys_handle_alarms",
+[SYS_set_alarm]      "sys_set_alarm"
 };
 
 void
