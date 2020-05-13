@@ -177,7 +177,8 @@ found:
   acquire(&tickslock);
   p->arrival_time = ticks;
   release(&tickslock);
-  p->level = 1;
+  p->level = 0;
+  p->tickets = 13;
   p->cycle_num = 1;
   p->state = EMBRYO;
   p->pid = nextpid++;
@@ -776,23 +777,21 @@ void print_proc_info()
   cprintf("Name\t\tPID\t\tState\t\tLevel\t\tTickets\t\tCycleNum\t\tHRRN\n");
 
   struct proc *p;
-  static char hrrn_ratio_str[10], cycle_num_str[10];
-  int hrrn_ratio;
+  static char hrrn_ratio_str[20];
+  float hrrn_ratio;
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
   {
     if (p->state == UNUSED)
       continue;
-
-    hrrn_ratio = (now - p->arrival_time) / p->cycle_num;
+    hrrn_ratio = (float)(now - p->arrival_time)/(float)p->cycle_num;
     ftoa(hrrn_ratio, hrrn_ratio_str, 3);
-    ftoa((float)p->cycle_num, cycle_num_str, 1);
-    cprintf("%s\t\t%d\t\t%s\t\t%d\t\t%d\t\t%s\t\t%s\n",
+    cprintf("%s\t\t%d\t\t%s\t\t%d\t\t%d\t\t%d\t\t%s\n",
             p->name,
             p->pid,
             states_str[p->state],
             p->level,
             p->tickets,
-            cycle_num_str,
+            p->cycle_num,
             hrrn_ratio_str);
   }
 }
