@@ -30,6 +30,8 @@ void set_alarm(int);
 int set_edx(int);
 int read_registers(void);
 int print_proc_info(void);
+void set_proc_tickets(int, int);
+void set_proc_level(int, int);
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);

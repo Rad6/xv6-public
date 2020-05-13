@@ -27,3 +27,5 @@
 #define SYS_set_edx 26
 #define SYS_read_registers 27
 #define SYS_print_proc_info 28
+#define SYS_set_proc_tickets 29
+#define SYS_set_proc_level 30

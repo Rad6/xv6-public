@@ -147,3 +147,21 @@ sys_print_proc_info(void) {
   print_proc_info();
   return 0;
 }
+
+int
+sys_set_proc_tickets(void) {
+  int pid, tickets;
+  argint(0, &pid);
+  argint(1, &tickets);
+  set_proc_tickets(pid, tickets);
+  return 0;
+}
+
+int
+sys_set_proc_level(void) {
+  int pid, level;
+  argint(0, &pid);
+  argint(1, &level);
+  set_proc_level(pid, level);
+  return 0;
+}
