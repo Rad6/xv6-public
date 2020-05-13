@@ -177,7 +177,7 @@ found:
   acquire(&tickslock);
   p->arrival_time = ticks;
   release(&tickslock);
-  p->level = 0;
+  p->level = 1;
   p->cycle_num = 1;
   p->state = EMBRYO;
   p->pid = nextpid++;
@@ -804,7 +804,14 @@ lottery_scheduling(void){
 
 void
 RR_scheduling(void){
-
+  struct proc *p;
+  struct cpu *c = mycpu();
+  c->proc = 0;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state != RUNNABLE)
+      continue;
+    context_switch(p, c);
+  }
 }
 
 void
