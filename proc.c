@@ -801,17 +801,57 @@ RR_scheduling(void){
 
 void
 HRRN_scheduling(void){
+  float max_hrrn = 0, curr_hrrn = 0;
+  int max_hrrn_pid = 0;
 
+  acquire(&tickslock);
+  uint now = ticks;
+  release(&tickslock);
+
+  struct proc *p;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->level == 2 && p->state == RUNNABLE)
+    {
+      curr_hrrn = now - p->arrival_time / p->cycle_num;
+      if (curr_hrrn > max_hrrn)
+      {
+        max_hrrn = curr_hrrn;
+        max_hrrn_pid = p->pid;
+      }
+    }
+  }
+  struct cpu *c = mycpu();
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->pid == max_hrrn_pid)
+    {
+      context_switch(p, c);
+      break;
+    }
+  }
 }
 
 void
 set_proc_tickets(int pid, int ticket_len){
-
+  struct proc *p;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->pid == pid)
+    {
+      p->tickets = ticket_len;
+      break;
+    }
 }
 
 void
 set_proc_level(int pid, int level){
-
+  struct proc *p;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->pid == pid)
+    {
+      p->level = level;
+      break;
+    }
 }
 
 void
@@ -823,5 +863,5 @@ context_switch(struct proc* p, struct cpu* c){
   p->state = RUNNING;
   swtch(&(c->scheduler), p->context);
   switchkvm();
-  // c->proc = 0;
+  c->proc = 0;
 }

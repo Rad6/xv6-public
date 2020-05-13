@@ -132,6 +132,7 @@ void            RR_scheduling(void);
 void            HRRN_scheduling(void);
 void            set_proc_tickets(int, int);
 void            set_proc_level(int, int);
+void            context_switch(struct proc*, struct cpu*);
 // swtch.S
 void            swtch(struct context**, struct context*);
 
