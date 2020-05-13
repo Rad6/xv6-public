@@ -25,12 +25,6 @@ struct {
   int seed;
 } randnum;
 
-struct{
-  int level1_cnt;
-  int level2_cnt;
-  int level3_cnt;
-  struct proc* cur_2;
-}schedulerSetting;
 
 static struct proc *initproc;
 
@@ -430,21 +424,35 @@ wait(void)
 void
 scheduler(void)
 {
-  // struct proc *p;
+  struct proc *p;
   // struct cpu *c = mycpu();
-  // c->proc = 0;
+  // c->proc = 0;web
   
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
-    if(schedulerSetting.level1_cnt > 0){
+    int level0 = 0, level1 = 0, level2 = 0;
 
-    }else if(schedulerSetting.level2_cnt > 0){
-
-    }else if(schedulerSetting.level3_cnt > 0){
-
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE) continue;
+      else{
+        if(p->level == 0) level0 = 1;
+        if(p->level == 1) level1 = 1;
+        if(p->level == 2) level2 = 1;
+      }
     }
+
+    if(level0)
+      lottery_scheduling();
+    else if(level1)
+      RR_scheduling();
+    else if(level2)
+      HRRN_scheduling();
+    
+    release(&ptable.lock);
+
 
     // Loop over process table looking for process to run. --------------- OLD BUT GOLD :/
     // acquire(&ptable.lock);
@@ -823,5 +831,5 @@ context_switch(struct proc* p, struct cpu* c){
   p->state = RUNNING;
   swtch(&(c->scheduler), p->context);
   switchkvm();
-  // c->proc = 0;
+  c->proc = 0;
 }
