@@ -37,6 +37,12 @@ static char *states_str[] = {
     [ZOMBIE]    "ZOMBIE "
   };
 
+unsigned int
+rand()
+{
+  return ticks * 1664525 + 1013904223;
+}
+
 int pow(int x, int y) 
 { 
     if (y == 0) 
@@ -733,8 +739,7 @@ void print_proc_info()
   acquire(&tickslock);
   uint now = ticks;
   release(&tickslock);
-
-  cprintf("Name        PID        State        Level        Tickets        CycleNum        HRRN\n");
+  cprintf("Name\t\tPID\t\tState\t\tLevel\t\tTickets\t\tCycleNum\t\tHRRN\n");
 
   struct proc *p;
   static char hrrn_ratio_str[10], cycle_num_str[10];
@@ -747,9 +752,13 @@ void print_proc_info()
     hrrn_ratio = (now - p->arrival_time) / p->cycle_num;
     ftoa(hrrn_ratio, hrrn_ratio_str, 3);
     ftoa((float)p->cycle_num, cycle_num_str, 1);
-    cprintf("%s        %d        %s        %d        %d",
-            p->name, p->pid, states_str[p->state], p->level, p->tickets);
-    cprintf("        %s", cycle_num_str);
-    cprintf("        %s\n", hrrn_ratio_str);
+    cprintf("%s\t\t%d\t\t%s\t\t%d\t\t%d\t\t%s\t\t%s\n",
+            p->name,
+            p->pid,
+            states_str[p->state],
+            p->level,
+            p->tickets,
+            cycle_num_str,
+            hrrn_ratio_str);
   }
 }
