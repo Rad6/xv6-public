@@ -20,6 +20,18 @@ struct {
   uint curr;
 } hptable;
 
+struct {
+  struct spinlock lock;
+  int seed;
+} randnum;
+
+struct{
+  int level1_cnt;
+  int level2_cnt;
+  int level3_cnt;
+  struct proc* cur_2;
+}schedulerSetting;
+
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -40,7 +52,13 @@ static char *states_str[] = {
 unsigned int
 rand()
 {
-  return ticks * 1664525 + 1013904223;
+  int num;
+  acquire(&randnum.lock);
+  randnum.seed = randnum.seed * 1664525 + 1013904223;
+  num = randnum.seed;
+  release(&randnum.lock);
+  return num;
+  // return ticks * 1664525 + 1013904223;
 }
 
 int pow(int x, int y) 
@@ -412,35 +430,43 @@ wait(void)
 void
 scheduler(void)
 {
-  struct proc *p;
-  struct cpu *c = mycpu();
-  c->proc = 0;
+  // struct proc *p;
+  // struct cpu *c = mycpu();
+  // c->proc = 0;
   
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
-    // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
+    if(schedulerSetting.level1_cnt > 0){
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
+    }else if(schedulerSetting.level2_cnt > 0){
 
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
+    }else if(schedulerSetting.level3_cnt > 0){
 
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
     }
-    release(&ptable.lock);
+
+    // Loop over process table looking for process to run. --------------- OLD BUT GOLD :/
+    // acquire(&ptable.lock);
+    // for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    //   if(p->state != RUNNABLE)
+    //     continue;
+
+    //   // Switch to chosen process.  It is the process's job
+    //   // to release ptable.lock and then reacquire it
+    //   // before jumping back to us.
+    //   c->proc = p;
+    //   switchuvm(p);
+    //   p->state = RUNNING;
+
+    //   swtch(&(c->scheduler), p->context);
+    //   switchkvm();
+
+    //   // Process is done running for now.
+    //   // It should have changed its p->state before coming back.
+    //   c->proc = 0;
+    // }
+    // release(&ptable.lock); ------------------------------------------- OLD BUT GOLD :/
 
   }
 }
@@ -761,4 +787,41 @@ void print_proc_info()
             cycle_num_str,
             hrrn_ratio_str);
   }
+}
+
+void 
+lottery_scheduling(void){
+
+}
+
+void
+RR_scheduling(void){
+
+}
+
+void
+HRRN_scheduling(void){
+
+}
+
+void
+set_proc_tickets(int pid, int ticket_len){
+
+}
+
+void
+set_proc_level(int pid, int level){
+
+}
+
+void
+context_switch(struct proc* p, struct cpu* c){
+  p->cycle_num++;
+  if(p->state != RUNNABLE) return;
+  c->proc = p;
+  switchuvm(p);
+  p->state = RUNNING;
+  swtch(&(c->scheduler), p->context);
+  switchkvm();
+  // c->proc = 0;
 }

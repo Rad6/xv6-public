@@ -127,6 +127,11 @@ void            set_alarm(int);
 void            set_edx(int);
 void            read_registers(void);
 void            print_proc_info(void);
+void            lottery_scheduling(void);
+void            RR_scheduling(void);
+void            HRRN_scheduling(void);
+void            set_proc_tickets(int, int);
+void            set_proc_level(int, int);
 // swtch.S
 void            swtch(struct context**, struct context*);
 
