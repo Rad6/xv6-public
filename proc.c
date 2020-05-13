@@ -12,6 +12,7 @@
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
+  struct proc* probin;
 } ptable;
 
 struct {
@@ -179,6 +180,7 @@ found:
   release(&tickslock);
   p->level = 1;
   p->cycle_num = 1;
+  p->tickets = 10;
   p->state = EMBRYO;
   p->pid = nextpid++;
 
@@ -824,10 +826,14 @@ RR_scheduling(void){
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->state != RUNNABLE)
-      continue;
-    context_switch(p, c);
+
+  if((!ptable.probin) || ptable.probin == &ptable.proc[NPROC])
+    ptable.probin = ptable.proc;
+
+  p = ptable.probin;
+  for(; p < &ptable.proc[NPROC]; p++){
+    if(p->state == RUNNABLE && p->level == 1)
+      context_switch(p, c);
   }
 }
 
