@@ -141,3 +141,9 @@ sys_read_registers(void){
   read_registers();
   return 0;
 }
+
+int
+sys_print_proc_info(void) {
+  print_proc_info();
+  return 0;
+}

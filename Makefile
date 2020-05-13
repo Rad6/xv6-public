@@ -187,6 +187,7 @@ UPROGS=\
 	_set_alarm\
 	_set_edx\
 	_read_registers\
+	_foo\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -257,7 +258,7 @@ EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
 	printf.c umalloc.c touch.c count_of_digit.c print_syscalls.c\
-	set_alarm.c\
+	set_alarm.c foo.c\
 	set_edx.c read_registers.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\

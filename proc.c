@@ -28,6 +28,68 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
+static char *states_str[] = {
+    [UNUSED]    "UNUSED ",
+    [EMBRYO]    "EMBRYO ",
+    [SLEEPING]  "SLEEPING",
+    [RUNNABLE]  "RUNNABLE",
+    [RUNNING]   "RUNNING ",
+    [ZOMBIE]    "ZOMBIE "
+  };
+
+int pow(int x, int y) 
+{ 
+    if (y == 0) 
+        return 1; 
+    else if (y%2 == 0) 
+        return pow(x, y/2)*pow(x, y/2); 
+    else
+        return x*pow(x, y/2)*pow(x, y/2); 
+} 
+
+void reverse(char* str, int len) 
+{ 
+    int i = 0, j = len - 1, temp; 
+    while (i < j) { 
+        temp = str[i]; 
+        str[i] = str[j]; 
+        str[j] = temp;
+        i++;
+        j--;
+    }
+}
+
+int intToStr(int x, char str[], int d)
+{
+    int i = 0;
+    while (x) {
+        str[i++] = (x % 10) + '0';
+        x = x / 10;
+    }
+  
+    while (i < d)
+        str[i++] = '0';
+  
+    reverse(str, i);
+    str[i] = '\0';
+    return i;
+} 
+  
+void ftoa(float n, char* res, int afterpoint) 
+{ 
+    int ipart = (int)n; 
+  
+    float fpart = n - (float)ipart; 
+  
+    int i = intToStr(ipart, res, 0); 
+  
+    if(afterpoint != 0) {
+        res[i] = '.';
+        fpart = fpart * pow(10, afterpoint); 
+        intToStr((int)fpart, res + i + 1, afterpoint); 
+    }
+}
+
 void
 pinit(void)
 {
@@ -664,4 +726,30 @@ tf->eax, tf->ebx, tf->ecx, tf->edx, tf->esi, tf->edi, tf->ebp, tf->esp);
   cprintf("### Segment registers ##\n\
 \tcs = %p\n\tds = %p\n\tes = %p\n\tfs = %p\n\tgs = %p\n\tss = %p\n", 
 tf->cs, tf->ds, tf->es, tf->fs, tf->gs, tf->ss);
+}
+
+void print_proc_info()
+{
+  acquire(&tickslock);
+  uint now = ticks;
+  release(&tickslock);
+
+  cprintf("Name        PID        State        Level        Tickets        CycleNum        HRRN\n");
+
+  struct proc *p;
+  static char hrrn_ratio_str[10], cycle_num_str[10];
+  int hrrn_ratio;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->state == UNUSED)
+      continue;
+
+    hrrn_ratio = (now - p->arrival_time) / p->cycle_num;
+    ftoa(hrrn_ratio, hrrn_ratio_str, 3);
+    ftoa((float)p->cycle_num, cycle_num_str, 1);
+    cprintf("%s        %d        %s        %d        %d",
+            p->name, p->pid, states_str[p->state], p->level, p->tickets);
+    cprintf("        %s", cycle_num_str);
+    cprintf("        %s\n", hrrn_ratio_str);
+  }
 }

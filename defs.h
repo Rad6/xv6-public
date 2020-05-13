@@ -126,6 +126,7 @@ void            handle_alarms(void);
 void            set_alarm(int);
 void            set_edx(int);
 void            read_registers(void);
+void            print_proc_info(void);
 // swtch.S
 void            swtch(struct context**, struct context*);
 
