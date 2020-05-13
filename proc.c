@@ -799,7 +799,24 @@ void print_proc_info()
 
 void 
 lottery_scheduling(void){
-
+  struct proc *p;
+  struct cpu *c = mycpu();
+  int total_tickets = 0;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->level == 0)
+      total_tickets += p->tickets;
+  int random_ticket = rand() % (total_tickets) + 1;
+  int cnt = 0;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->level == 0)
+    {
+      cnt += p->tickets;
+      if (random_ticket <= cnt)
+      {
+        context_switch(p, c);
+        break;
+      }
+    }
 }
 
 void
