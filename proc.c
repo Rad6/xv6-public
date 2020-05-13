@@ -94,6 +94,11 @@ allocproc(void)
   return 0;
 
 found:
+  acquire(&tickslock);
+  p->arrival_time = ticks;
+  release(&tickslock);
+  p->level = 0;
+  p->cycle_num = 1;
   p->state = EMBRYO;
   p->pid = nextpid++;
 

@@ -54,6 +54,10 @@ struct proc {
   uint  psys;
   int alarm_ticks;            // Time for the alarm in msec
 
+  int level;                   // 0 for lottery, 1 for RR, 2 for HRRN
+  int tickets;
+  int arrival_time;
+  int cycle_num;
 };
 
 // Process memory is laid out contiguously, low addresses first:
