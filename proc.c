@@ -176,15 +176,16 @@ allocproc(void)
   return 0;
 
 found:
+  p->level = 0;
   acquire(&tickslock);
   p->arrival_time = ticks;
   release(&tickslock);
-  p->level = 1;
   p->tickets = 13;
   p->cycle_num = 1;
+  p->waited_cycles = 0;
   p->state = EMBRYO;
   p->pid = nextpid++;
-
+  
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -428,15 +429,14 @@ void
 scheduler(void)
 {
   struct proc *p;
-  // struct cpu *c = mycpu();
-  // c->proc = 0;web
+  struct cpu *c = mycpu();
+  c->proc = 0;
   
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
     int level0 = 0, level1 = 0, level2 = 0;
-
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE) continue;
@@ -776,7 +776,7 @@ void print_proc_info()
   acquire(&tickslock);
   uint now = ticks;
   release(&tickslock);
-  cprintf("Name\t\tPID\t\tState\t\tLevel\t\tTickets\t\tCycleNum\t\tHRRN\n");
+  cprintf("Name\t\tPID\t\tState\t\tLevel\t\tTickets\t\tcycle numbers\t\tHRRN\t\twaited cycles\n");
 
   struct proc *p;
   static char hrrn_ratio_str[20];
@@ -787,14 +787,15 @@ void print_proc_info()
       continue;
     hrrn_ratio = (float)(now - p->arrival_time)/(float)p->cycle_num;
     ftoa(hrrn_ratio, hrrn_ratio_str, 3);
-    cprintf("%s\t\t%d\t\t%s\t\t%d\t\t%d\t\t%d\t\t%s\n",
+    cprintf("%s\t\t%d\t\t%s\t\t%d\t\t%d\t\t%d\t\t%s\t\t%d\n",
             p->name,
             p->pid,
             states_str[p->state],
             p->level,
             p->tickets,
             p->cycle_num,
-            hrrn_ratio_str);
+            hrrn_ratio_str,
+            p->waited_cycles);
   }
 }
 
@@ -856,19 +857,19 @@ RR_scheduling(void){
 
 void
 HRRN_scheduling(void){
-  float max_hrrn = 0, curr_hrrn = 0;
-  int max_hrrn_pid = 0;
-
-  acquire(&tickslock);
-  uint now = ticks;
-  release(&tickslock);
-
   struct proc *p;
+  struct cpu *c = mycpu();
+  float max_hrrn = -1;
+  int max_hrrn_pid = -1;
+
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
   {
     if (p->level == 2 && p->state == RUNNABLE)
     {
-      curr_hrrn = now - p->arrival_time / p->cycle_num;
+      acquire(&tickslock);
+      float waiting = (float)(ticks - p->arrival_time);
+      release(&tickslock);
+      float curr_hrrn = waiting / (float)(p->cycle_num);
       if (curr_hrrn > max_hrrn)
       {
         max_hrrn = curr_hrrn;
@@ -876,10 +877,9 @@ HRRN_scheduling(void){
       }
     }
   }
-  struct cpu *c = mycpu();
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
   {
-    if (p->pid == max_hrrn_pid)
+    if (p->level == 2 && p->state == RUNNABLE && p->pid == max_hrrn_pid)
     {
       context_switch(p, c);
       break;
@@ -911,12 +911,26 @@ set_proc_level(int pid, int level){
 
 void
 context_switch(struct proc* p, struct cpu* c){
-  p->cycle_num++;
   if(p->state != RUNNABLE) return;
+  p->cycle_num++;
   c->proc = p;
   switchuvm(p);
   p->state = RUNNING;
   swtch(&(c->scheduler), p->context);
   switchkvm();
   c->proc = 0;
+  age_processes(p->pid);
+}
+
+void age_processes(int runner_pid) {
+  struct proc *p;
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if(p->state == UNUSED)
+      continue;
+    if (p->pid != runner_pid)
+      if(++p->waited_cycles >= 2500)
+        set_proc_level(p->pid, 0);
+  }
 }
