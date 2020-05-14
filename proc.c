@@ -13,6 +13,7 @@ struct {
   struct spinlock lock;
   struct proc proc[NPROC];
   struct proc* probin;
+  int rindex;
 } ptable;
 
 struct {
@@ -181,7 +182,6 @@ found:
   p->level = 1;
   p->tickets = 13;
   p->cycle_num = 1;
-  p->tickets = 10;
   p->state = EMBRYO;
   p->pid = nextpid++;
 
@@ -826,16 +826,32 @@ RR_scheduling(void){
   struct cpu *c = mycpu();
   c->proc = 0;
 
-  if((!ptable.probin) || ptable.probin == &ptable.proc[NPROC])
-    ptable.probin = ptable.proc;
+  // version 3 (Works Well)
+  if((ptable.rindex == 0) || (ptable.rindex == NPROC))
+    ptable.rindex= 0;
 
-  p = ptable.probin;
-  for(; p < &ptable.proc[NPROC]; p++){
+  for(; ptable.rindex < NPROC; ptable.rindex++){
+    p = &ptable.proc[ptable.rindex];
+    // if(p->pid != 0) cprintf("\t%s %d\n", p->name, ptable.rindex);
     if(p->state == RUNNABLE && p->level == 1){
       context_switch(p, c);
-      break;
+      ptable.rindex++;
+      return;
     }
   }
+
+  // version 2(Does not Work)
+  // if((!ptable.probin) || (ptable.probin == &ptable.proc[NPROC]))
+  //   ptable.probin = ptable.proc;
+
+  // p = ptable.probin;
+  // for(; p < &ptable.proc[NPROC]; p++){
+  //   if(p->state == RUNNABLE && p->level == 1){
+  //     context_switch(p, c);
+  //     p++;
+  //     return;
+  //   }
+  // }
 }
 
 void
