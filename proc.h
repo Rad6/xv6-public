@@ -58,6 +58,7 @@ struct proc {
   int tickets;
   int arrival_time;
   int cycle_num;
+  int waited_cycles;
 };
 
 // Process memory is laid out contiguously, low addresses first:

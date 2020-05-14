@@ -135,6 +135,7 @@ void            set_proc_level(int, int);
 void            context_switch(struct proc*, struct cpu*);
 void            set_proc_tickets(int, int);
 void            set_proc_level(int, int);
+void            age_processes(int);
 // swtch.S
 void            swtch(struct context**, struct context*);
 

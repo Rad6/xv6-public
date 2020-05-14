@@ -97,9 +97,10 @@ exec(char *path, char **argv)
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;
   curproc->sz = sz;
-  curproc->tf->eip = elf.entry;  // main
-  curproc->tf->esp = sp;
   curproc->level = 0;
+  curproc->tickets = 10000;
+  curproc->tf->eip = elf.entry; // main
+  curproc->tf->esp = sp;
   switchuvm(curproc);
   freevm(oldpgdir);
   return 0;
