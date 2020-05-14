@@ -178,7 +178,7 @@ found:
   acquire(&tickslock);
   p->arrival_time = ticks;
   release(&tickslock);
-  p->level = 0;
+  p->level = 1;
   p->tickets = 13;
   p->cycle_num = 1;
   p->tickets = 10;
@@ -831,8 +831,10 @@ RR_scheduling(void){
 
   p = ptable.probin;
   for(; p < &ptable.proc[NPROC]; p++){
-    if(p->state == RUNNABLE && p->level == 1)
+    if(p->state == RUNNABLE && p->level == 1){
       context_switch(p, c);
+      break;
+    }
   }
 }
 
