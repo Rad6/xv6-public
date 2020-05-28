@@ -18,6 +18,11 @@ struct {
   int rindex;
 } ptable;
 
+struct{
+  int cnt;
+  struct spinlock lock;
+} count;
+
 struct {
   struct spinlock lock;
   struct proc proc[NAPROC];
@@ -972,4 +977,22 @@ check_lock(void){
     //   testlock.stuff *= 138957;
     // cprintf("stuff for pid %d is %d\n", myproc()->pid, testlock.stuff);
     // release(&testlock.lock);
+}
+
+void
+sys_count()
+{
+  acquire(&count.lock);
+  cprintf("Total count: %d\n", count.cnt);
+  release(&count.lock);
+
+  for (int i = 0; i < ncpu; ++i) 
+    cprintf("CPU count: %d \n", cpus[i].sys_counter);
+}
+
+void
+increment_syscount(){
+  acquire(&count.lock);
+  count.cnt++;
+  release(&count.lock);
 }

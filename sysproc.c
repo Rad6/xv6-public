@@ -6,7 +6,6 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
-#include "spinlock.h"
 
 int
 sys_fork(void)
@@ -170,5 +169,10 @@ sys_set_proc_level(void) {
 int
 sys_check_lock(void){
   check_lock();
+  return 0;
+}
+
+int sys_sys_count(void) {
+  sys_count();
   return 0;
 }

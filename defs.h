@@ -138,6 +138,8 @@ void            set_proc_tickets(int, int);
 void            set_proc_level(int, int);
 void            age_processes(int);
 void            check_lock(void);
+void            sys_count(void);
+void            increment_syscount(void);
 // swtch.S
 void            swtch(struct context**, struct context*);
 

@@ -30,3 +30,4 @@
 #define SYS_set_proc_tickets 29
 #define SYS_set_proc_level 30
 #define SYS_check_lock 31
+#define SYS_sys_count 32

@@ -8,6 +8,7 @@ struct cpu {
   int ncli;                    // Depth of pushcli nesting.
   int intena;                  // Were interrupts enabled before pushcli?
   struct proc *proc;           // The process running on this cpu or null
+  int sys_counter;             // Number of system calls invoked in this cpu
 };
 
 extern struct cpu cpus[NCPU];

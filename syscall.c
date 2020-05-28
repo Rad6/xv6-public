@@ -113,6 +113,8 @@ extern int sys_print_proc_info(void);
 extern int sys_set_proc_tickets(void);
 extern int sys_set_proc_level(void);
 extern int sys_check_lock(void);
+extern int sys_sys_count(void);
+
 
 static int (*syscalls[])(void) = {
 [SYS_fork]           sys_fork,
@@ -146,6 +148,7 @@ static int (*syscalls[])(void) = {
 [SYS_set_proc_tickets] sys_set_proc_tickets,
 [SYS_set_proc_level] sys_set_proc_level,
 [SYS_check_lock] sys_check_lock,
+[SYS_sys_count] sys_sys_count,
 };
 
 // need to add the syscalls names too!
@@ -181,6 +184,7 @@ static char* sys_names[] = {
 [SYS_set_proc_tickets] "sys_set_proc_tickets",
 [SYS_set_proc_level] "sys_set_proc_level",
 [SYS_check_lock] "sys_check_lock",
+[SYS_sys_count] "sys_sys_count",
 };
 
 void
@@ -197,6 +201,14 @@ syscall(void)
       curproc->syscalls_name[curproc->psys] = sys_names[num];
       curproc->syscalls_out[curproc->psys++] = return_value;
     }
+
+    increment_syscount(); // increment the shared variable
+
+    pushcli();
+    struct cpu *c = mycpu();
+    c->sys_counter++;  // increment cpu-specific variable
+    popcli();
+
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);
