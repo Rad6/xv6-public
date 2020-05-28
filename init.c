@@ -11,7 +11,7 @@ int
 main(void)
 {
   int pid, wpid;
-  int alarmhandler_pid;
+  // int alarmhandler_pid;
 
   if(open("console", O_RDWR) < 0){
     mknod("console", 1, 1);
@@ -27,17 +27,17 @@ main(void)
       printf(1, "init: fork failed\n");
       exit();
     }
-    if (pid > 0)
-    {
-      alarmhandler_pid = fork();
-      if (alarmhandler_pid < 0)
-      {
-        printf(1, "init: fork alarm handler failed\n");
-        exit();
-      }
-      if (alarmhandler_pid == 0)
-        handle_alarms();
-    }
+    // if (pid > 0)
+    // {
+    //   alarmhandler_pid = fork();
+    //   if (alarmhandler_pid < 0)
+    //   {
+    //     printf(1, "init: fork alarm handler failed\n");
+    //     exit();
+    //   }
+    //   if (alarmhandler_pid == 0)
+    //     handle_alarms();
+    // }
     if(pid == 0){
       exec("sh", argv);
       printf(1, "init: exec sh failed\n");
