@@ -7,6 +7,7 @@ struct proc;
 struct rtcdate;
 struct spinlock;
 struct sleeplock;
+struct prioritylock;
 struct stat;
 struct superblock;
 
@@ -136,6 +137,7 @@ void            context_switch(struct proc*, struct cpu*);
 void            set_proc_tickets(int, int);
 void            set_proc_level(int, int);
 void            age_processes(int);
+void            check_lock(void);
 // swtch.S
 void            swtch(struct context**, struct context*);
 
@@ -153,6 +155,13 @@ void            acquiresleep(struct sleeplock*);
 void            releasesleep(struct sleeplock*);
 int             holdingsleep(struct sleeplock*);
 void            initsleeplock(struct sleeplock*, char*);
+
+// prioritylock.c
+void            print_lock_queue(struct proc*);
+void            pacquiresleep(struct prioritylock*);
+void            preleasesleep(struct prioritylock*);
+int             pholdingsleep(struct prioritylock*);
+void            initprioritylock(struct prioritylock*, char*);
 
 // string.c
 int             memcmp(const void*, const void*, uint);

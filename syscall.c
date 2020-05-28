@@ -112,6 +112,7 @@ extern int sys_read_registers(void);
 extern int sys_print_proc_info(void);
 extern int sys_set_proc_tickets(void);
 extern int sys_set_proc_level(void);
+extern int sys_check_lock(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]           sys_fork,
@@ -144,6 +145,7 @@ static int (*syscalls[])(void) = {
 [SYS_print_proc_info] sys_print_proc_info,
 [SYS_set_proc_tickets] sys_set_proc_tickets,
 [SYS_set_proc_level] sys_set_proc_level,
+[SYS_check_lock] sys_check_lock,
 };
 
 // need to add the syscalls names too!
@@ -178,6 +180,7 @@ static char* sys_names[] = {
 [SYS_print_proc_info] "sys_print_proc_info",
 [SYS_set_proc_tickets] "sys_set_proc_tickets",
 [SYS_set_proc_level] "sys_set_proc_level",
+[SYS_check_lock] "sys_check_lock",
 };
 
 void

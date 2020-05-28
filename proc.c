@@ -6,6 +6,8 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "prioritylock.h"
+#include "sleeplock.h"
 
 #define ALARM_HANDLER "alarm_handler"
 
@@ -176,6 +178,8 @@ allocproc(void)
   return 0;
 
 found:
+  p->locked_in_queue = 0;
+  p->locked_next = 0;
   p->level = 0;
   acquire(&tickslock);
   p->arrival_time = ticks;
@@ -933,4 +937,39 @@ void age_processes(int runner_pid) {
       if(++p->waited_cycles >= 2500)
         set_proc_level(p->pid, 0);
   }
+}
+
+struct{
+  struct prioritylock lock;
+  int stuff;
+} testlock;
+
+void
+check_lock(void){
+    // sleep lock
+    // acquiresleep(&testlock.lock);
+    // testlock.stuff += 1;
+    // cprintf("proc, %d:\n", myproc()->pid);
+    // for(int i = 0; i < 100090000; i++)
+    //   testlock.stuff *= 138957;
+    // cprintf("stuff for pid %d is %d\n", myproc()->pid, testlock.stuff);
+    // releasesleep(&testlock.lock);
+
+    // priority lock
+    pacquiresleep(&testlock.lock);
+    testlock.stuff += 1;
+    cprintf("proc, %d:\n", myproc()->pid);
+    for(int i = 0; i < 100090000; i++)
+      testlock.stuff *= 138957;
+    cprintf("stuff for pid %d is %d #DONE\n", myproc()->pid, testlock.stuff);
+    preleasesleep(&testlock.lock);
+
+    // spinlock
+    // acquire(&testlock.lock);
+    // testlock.stuff += 1;
+    // cprintf("proc, %d\n", myproc()->pid);
+    // for(int i = 0; i < 100090000; i++)
+    //   testlock.stuff *= 138957;
+    // cprintf("stuff for pid %d is %d\n", myproc()->pid, testlock.stuff);
+    // release(&testlock.lock);
 }

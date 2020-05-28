@@ -1,5 +1,6 @@
 struct stat;
 struct rtcdate;
+struct spinlock;
 
 // system calls
 int fork(void);
@@ -32,6 +33,7 @@ int read_registers(void);
 int print_proc_info(void);
 void set_proc_tickets(int, int);
 void set_proc_level(int, int);
+void check_lock(void);
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);
