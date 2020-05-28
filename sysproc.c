@@ -170,43 +170,5 @@ sys_set_proc_level(void) {
 int
 sys_check_lock(void){
   check_lock();
-  // int spinver = 1;
-  // if(!spinver){
-  //   struct prioritylock lk;
-  //   initprioritylock(&lk, "test_p_lock");
-  //   int fk = fork();
-  //   if(fk == 0){
-  //     pacquiresleep(&lk);
-  //     cprintf("child: in the lock\n");
-  //     preleasesleep(&lk);
-  //     cprintf("child: out of the lock\n");
-  //   }
-  //   else{
-  //     pacquiresleep(&lk);
-  //     cprintf("parent: in the lock\n");
-  //     preleasesleep(&lk);
-  //     cprintf("parent: out of the lock\n");
-  //     wait();
-  //   }
-  // }
-  // else{
-  //   cprintf("spinlock version\n");
-  //   struct spinlock lk;
-  //   int fk = fork();
-  //   if(fk == 0){
-  //     cprintf("hi im child\n");
-  //     acquire(&lk);
-  //     cprintf("child: in the lock\n");
-  //     release(&lk);
-  //     cprintf("child: out of the lock\n");
-  //   }
-  //   else if(fk>0){
-  //     acquire(&lk);
-  //     cprintf("parent: in the lock\n");
-  //     release(&lk);
-  //     cprintf("parent: out of the lock\n");
-  //     // wait();
-  //   }
-  // }
   return 0;
 }
