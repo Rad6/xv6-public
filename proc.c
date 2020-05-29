@@ -987,7 +987,7 @@ sys_count()
   release(&count.lock);
 
   for (int i = 0; i < ncpu; ++i) 
-    cprintf("CPU count: %d \n", cpus[i].sys_counter);
+    cprintf("CPU %d count: %d \n", cpus[i].apicid, cpus[i].sys_counter);
 }
 
 void
@@ -1021,5 +1021,5 @@ void increment_cpu_syscount() {
   // pushcli();
   // mycpu()->sys_counter++;
   // popcli();
-  
+
 }
