@@ -996,3 +996,9 @@ increment_syscount(){
   count.cnt++;
   release(&count.lock);
 }
+
+void increment_cpu_syscount() {
+  pushcli();
+  mycpu()->sys_counter++;
+  popcli();
+}

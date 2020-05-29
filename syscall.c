@@ -204,10 +204,7 @@ syscall(void)
 
     increment_syscount(); // increment the shared variable
 
-    pushcli();
-    struct cpu *c = mycpu();
-    c->sys_counter++;  // increment cpu-specific variable
-    popcli();
+    increment_cpu_syscount(); // increment cpu-specific variable
 
   } else {
     cprintf("%d %s: unknown sys call %d\n",
