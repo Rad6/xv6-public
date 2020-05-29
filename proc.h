@@ -1,4 +1,15 @@
 // Per-CPU state
+
+struct cpuspinlock {
+  uint locked;       // Is the lock held?
+
+  // For debugging:
+  char *name;        // Name of lock.
+  struct cpu *cpu;   // The cpu holding the lock.
+  uint pcs[10];      // The call stack (an array of program counters)
+                     // that locked the lock.
+};
+
 struct cpu {
   uchar apicid;                // Local APIC ID
   struct context *scheduler;   // swtch() here to enter scheduler
@@ -9,6 +20,9 @@ struct cpu {
   int intena;                  // Were interrupts enabled before pushcli?
   struct proc *proc;           // The process running on this cpu or null
   int sys_counter;             // Number of system calls invoked in this cpu
+
+  // lock
+  struct cpuspinlock lock;
 };
 
 extern struct cpu cpus[NCPU];

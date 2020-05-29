@@ -11,6 +11,8 @@ struct prioritylock;
 struct stat;
 struct superblock;
 
+struct cpuspinlock;
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);
@@ -152,6 +154,10 @@ void            initlock(struct spinlock*, char*);
 void            release(struct spinlock*);
 void            pushcli(void);
 void            popcli(void);
+
+void            cpuacquire(struct cpuspinlock*);
+void            cpurelease(struct cpuspinlock*);
+int             cpuholding(struct cpuspinlock*);
 
 // sleeplock.c
 void            acquiresleep(struct sleeplock*);

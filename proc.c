@@ -998,7 +998,28 @@ increment_syscount(){
 }
 
 void increment_cpu_syscount() {
+
+  // 1
   pushcli();
-  mycpu()->sys_counter++;
+  struct cpu *c = mycpu();
   popcli();
+  cpuacquire(&(c->lock));
+  c->sys_counter++;
+  cpurelease(&c->lock);
+
+  // 2
+  // Envolving incrementation (++) inside the pushcli and popcli area (with interrupts disabled) :
+  // pushcli();
+  // struct cpu *c = mycpu();
+  // cpuacquire(&(c->lock));
+  // c->sys_counter++;
+  // cpurelease(&c->lock);
+  // popcli();
+
+  // 3
+  // Doing it without Lock at all! No preemption will happen by disabling interrupts :
+  // pushcli();
+  // mycpu()->sys_counter++;
+  // popcli();
+  
 }

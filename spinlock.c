@@ -124,3 +124,44 @@ popcli(void)
     sti();
 }
 
+
+void
+cpuacquire(struct cpuspinlock *lk)
+{
+  pushcli(); // disable interrupts to avoid deadlock.
+  if(cpuholding(lk))
+    panic("acquire");
+
+  while(xchg(&lk->locked, 1) != 0)
+    ;
+
+  __sync_synchronize();
+
+  lk->cpu = mycpu();
+  getcallerpcs(&lk, lk->pcs);
+}
+
+int
+cpuholding(struct cpuspinlock *lock)
+{
+  int r;
+  pushcli();
+  r = lock->locked && lock->cpu == mycpu();
+  popcli();
+  return r;
+}
+
+void
+cpurelease(struct cpuspinlock *lk)
+{
+  if(!cpuholding(lk))
+    panic("release");
+
+  lk->pcs[0] = 0;
+  lk->cpu = 0;
+  __sync_synchronize();
+
+  asm volatile("movl $0, %0" : "+m" (lk->locked) : );
+
+  popcli();
+}
