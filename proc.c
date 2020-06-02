@@ -982,12 +982,21 @@ check_lock(void){
 void
 sys_count()
 {
-  acquire(&count.lock);
-  cprintf("Total count: %d\n", count.cnt);
-  release(&count.lock);
+  pushcli(); // both total and per-cpu locks should get acquired at a same time (with no interrupts)
 
+  acquire(&count.lock); // totol counter
+  for (int i = 0; i < ncpu; ++i) 
+    cpuacquire(&cpus[i].lock); // for each cpu
+
+  popcli();
+
+  cprintf("Total count: %d\n", count.cnt);
   for (int i = 0; i < ncpu; ++i) 
     cprintf("CPU %d count: %d \n", cpus[i].apicid, cpus[i].sys_counter);
+
+  release(&count.lock);
+  for (int i = 0; i < ncpu; ++i) 
+    cpurelease(&cpus[i].lock);
 }
 
 void
