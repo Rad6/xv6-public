@@ -168,30 +168,30 @@ mkfs: mkfs.c fs.h
 
 UPROGS=\
 	_cat\
+	_checklock\
+	_count_of_digit\
 	_echo\
 	_forktest\
+	_foo\
 	_grep\
 	_init\
 	_kill\
 	_ln\
 	_ls\
 	_mkdir\
+	_ppi\
+	_print_syscalls\
+	_read_registers\
 	_rm\
+	_set_alarm\
+	_set_edx\
+	_syscount\
 	_sh\
 	_stressfs\
+	_touch\
 	_usertests\
 	_wc\
 	_zombie\
-	_touch\
-	_count_of_digit\
-	_print_syscalls\
-	_set_alarm\
-	_set_edx\
-	_read_registers\
-	_foo\
-	_ppi\
-	_checklock\
-	_syscount\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
