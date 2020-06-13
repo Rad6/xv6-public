@@ -9,7 +9,6 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "prioritylock.h"
-#define NULL ((void*)0)
 
 void
 print_lock_queue(struct proc* p){
