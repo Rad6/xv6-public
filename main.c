@@ -21,7 +21,7 @@ main(void)
   
   for (int i = 0; i < 3; i++) // phys shared page allocator
 		if((phshared_data[i] = kalloc()) == 0)
-      panic("faild while to phys shared page allocating");
+      panic("failed while allocating phys shared pages");
 
   kvmalloc();      // kernel page table
   mpinit();        // detect other processors
