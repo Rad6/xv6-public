@@ -176,3 +176,41 @@ int sys_sys_count(void) {
   sys_count();
   return 0;
 }
+
+int
+sys_shmget(void){
+  int mode;
+  if(argint(0, &mode) < 0)
+    return -1;
+  
+  cprintf("PID : %d\n", myproc()->pid);
+  
+  if(mode == 4){ // read for testing parent process after forking new one who creates new share
+    int* res2 = shmget(2);
+    cprintf("read mode: res2 addr = %x\n",  res2);
+    cprintf("read mode: res2 data = %d\n", *res2);
+  }
+  else if(mode == 3){ // read page 1 and write on page 2 for testing fork in child
+    // int* res2 = (int*)0x2000;
+    int* res1 = shmget(1);
+    cprintf("write mode: res1 addr = %x\n",  res1);
+    cprintf("write mode: res1 data = %d\n", *res1);
+    int* res2 = shmget(2);
+    *res2 = -69;
+    cprintf("write mode: res2 addr = %x\n",  res2);
+    cprintf("write mode: res2 data = %d\n", *res2);
+  }
+  else if(mode == 2){ // read
+    int* res1 = shmget(1);
+    cprintf("write mode: res1 addr = %x\n",  res1);
+    cprintf("write mode: res1 data = %d\n", *res1);
+  }
+  else if(mode == 1){ // write and read
+    int* res1 = shmget(1);
+    *res1 = 12;
+    cprintf("write mode: res1 addr = %x\n",  res1);
+    cprintf("write mode: res1 data = %d\n", *res1);
+  }
+  
+  return 0;
+}

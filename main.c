@@ -18,6 +18,11 @@ int
 main(void)
 {
   kinit1(end, P2V(4*1024*1024)); // phys page allocator
+  
+  for (int i = 0; i < 3; i++) // phys shared page allocator
+		if((phshared_data[i] = kalloc()) == 0)
+      panic("faild while to phys shared page allocating");
+
   kvmalloc();      // kernel page table
   mpinit();        // detect other processors
   lapicinit();     // interrupt controller

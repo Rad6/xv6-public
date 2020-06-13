@@ -12,7 +12,7 @@ struct stat;
 struct superblock;
 
 struct cpuspinlock;
-
+extern void* phshared_data[3];
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);
@@ -143,6 +143,7 @@ void            check_lock(void);
 void            sys_count(void);
 void            increment_syscount(void);
 void            increment_cpu_syscount(void);
+void*           shmget(int);
 // swtch.S
 void            swtch(struct context**, struct context*);
 
@@ -218,6 +219,7 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
-
+int             mapShV2P(int);
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+#define NULL (void*)0

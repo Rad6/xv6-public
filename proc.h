@@ -75,6 +75,7 @@ struct proc {
   int arrival_time;
   int cycle_num;
   int waited_cycles;
+  int is_shp_alloc[3];
 };
 
 // Process memory is laid out contiguously, low addresses first:

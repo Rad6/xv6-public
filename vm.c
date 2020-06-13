@@ -9,7 +9,7 @@
 
 extern char data[];  // defined by kernel.ld
 pde_t *kpgdir;  // for use in scheduler()
-
+void* phshared_data[3];
 // Set up CPU's kernel segment descriptors.
 // Run once on entry on each CPU.
 void
@@ -287,7 +287,7 @@ freevm(pde_t *pgdir)
 
   if(pgdir == 0)
     panic("freevm: no pgdir");
-  deallocuvm(pgdir, KERNBASE, 0);
+  deallocuvm(pgdir, KERNBASE, 0x4000);
   for(i = 0; i < NPDENTRIES; i++){
     if(pgdir[i] & PTE_P){
       char * v = P2V(PTE_ADDR(pgdir[i]));
@@ -322,6 +322,16 @@ copyuvm(pde_t *pgdir, uint sz)
 
   if((d = setupkvm()) == 0)
     return 0;
+  
+  struct proc* currproc = myproc();
+  for(int j = 0; j < 3; j++){
+    if(currproc->is_shp_alloc[j] != 0) {
+      cprintf("copying shared 0x%x from pid : %d to new proc\n", currproc->is_shp_alloc[j], currproc->pid);
+      if(mappages(d, (void*)((j + 1)*0x1000), PGSIZE, V2P(phshared_data[j]), PTE_W|PTE_U) < 0)
+        goto bad;
+    }
+  }  
+
   for(i = 0x4000; i < sz; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
@@ -392,3 +402,12 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
 //PAGEBREAK!
 // Blank page.
 
+int
+mapShV2P(int shpid){
+  struct proc* currproc = myproc();
+  if(mappages(currproc->pgdir, (void*)(currproc->is_shp_alloc[shpid]), PGSIZE, V2P(phshared_data[shpid]), PTE_W|PTE_U) < 0){
+    cprintf("mapShV2P: I cant map the shit\n");
+    return -1;
+  }
+  return 0;
+}

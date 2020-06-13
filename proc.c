@@ -10,6 +10,7 @@
 #include "sleeplock.h"
 
 #define ALARM_HANDLER "alarm_handler"
+extern void* phshared_data[3];
 
 struct {
   struct spinlock lock;
@@ -295,6 +296,9 @@ fork(void)
     return -1;
   }
 
+  for(int i = 0; i < 3; i++)
+    np->is_shp_alloc[i] = curproc->is_shp_alloc[i];
+  
   // Copy process state from proc.
   if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
     kfree(np->kstack);
@@ -1031,4 +1035,29 @@ void increment_cpu_syscount() {
   // mycpu()->sys_counter++;
   // popcli();
 
+}
+
+void* 
+shmget(int shared_page_id){
+  shared_page_id--;
+
+  if(shared_page_id < 0 || shared_page_id > 2)
+    return NULL;
+
+  struct proc* currproc = myproc();
+
+  if(currproc->is_shp_alloc[shared_page_id] != 0){ // already allocated
+    return (void*)currproc->is_shp_alloc[shared_page_id];
+  } 
+  else { // not allocated yet
+    currproc->is_shp_alloc[shared_page_id] = (shared_page_id + 1)*0x1000;
+    cprintf("shmget: new mapping for shared page on 0x%x of pid : %d\n", currproc->is_shp_alloc[shared_page_id], currproc->pid);
+    if(mapShV2P(shared_page_id) < 0){
+      return NULL;
+    // if(mappages(currproc->pgdir, (void*)(currproc->is_shp_alloc[shared_page_id]), PGSIZE, V2P(phshared_data[shared_page_id]), PTE_W|PTE_U) < 0){
+    }
+    return (void*)currproc->is_shp_alloc[shared_page_id];
+  }
+
+  return NULL;
 }
