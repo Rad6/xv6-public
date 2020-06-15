@@ -193,8 +193,8 @@ sys_shmget(void){
   else if(mode == 3){ // read page 1 and write on page 2 for testing fork in child
     // int* res2 = (int*)0x2000;
     int* res1 = shmget(1);
-    cprintf("write mode: res1 addr = %x\n",  res1);
-    cprintf("write mode: res1 data = %d\n", *res1);
+    cprintf("read mode: res1 addr = %x\n",  res1);
+    cprintf("read mode: res1 data = %d\n", *res1);
     int* res2 = shmget(2);
     *res2 = -69;
     cprintf("write mode: res2 addr = %x\n",  res2);
