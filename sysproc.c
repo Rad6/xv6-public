@@ -202,8 +202,8 @@ sys_shmget(void){
   }
   else if(mode == 2){ // read
     int* res1 = shmget(1);
-    cprintf("write mode: res1 addr = %x\n",  res1);
-    cprintf("write mode: res1 data = %d\n", *res1);
+    cprintf("read mode: res1 addr = %x\n",  res1);
+    cprintf("read mode: res1 data = %d\n", *res1);
   }
   else if(mode == 1){ // write and read
     int* res1 = shmget(1);
