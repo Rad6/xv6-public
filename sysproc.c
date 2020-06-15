@@ -179,6 +179,14 @@ int sys_sys_count(void) {
 
 int
 sys_shmget(void){
+  int page_id;
+  if(argint(0, &page_id) < 0)
+    return -1;
+  return (int)shmget(page_id);
+}
+
+int
+sys_testshmget(void){
   int mode;
   if(argint(0, &mode) < 0)
     return -1;

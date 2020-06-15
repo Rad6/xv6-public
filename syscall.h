@@ -32,3 +32,4 @@
 #define SYS_check_lock 31
 #define SYS_sys_count 32
 #define SYS_shmget 33
+#define SYS_testshmget 34

@@ -115,6 +115,7 @@ extern int sys_set_proc_level(void);
 extern int sys_check_lock(void);
 extern int sys_sys_count(void);
 extern int sys_shmget(void);
+extern int sys_testshmget(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]           sys_fork,
@@ -150,6 +151,7 @@ static int (*syscalls[])(void) = {
 [SYS_check_lock] sys_check_lock,
 [SYS_sys_count] sys_sys_count,
 [SYS_shmget] sys_shmget,
+[SYS_testshmget] sys_testshmget,
 };
 
 // need to add the syscalls names too!
@@ -187,6 +189,7 @@ static char* sys_names[] = {
 [SYS_check_lock] "sys_check_lock",
 [SYS_sys_count] "sys_sys_count",
 [SYS_shmget] "sys_shmget",
+[SYS_testshmget] "sys_testshmget",
 };
 
 void

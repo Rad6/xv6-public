@@ -36,6 +36,7 @@ void set_proc_level(int, int);
 void check_lock(void);
 void sys_count(void);
 void* shmget(int);
+int testshmget(int);
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);
